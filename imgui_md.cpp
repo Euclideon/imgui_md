@@ -167,14 +167,24 @@ void imgui_md::BLOCK_TABLE(const MD_BLOCK_TABLE_DETAIL *pDetails, bool e)
 {
   if (e)
   {
-    char buffer[32] = {};
     m_tableCount++;
-    sprintf(buffer, "t%d", m_tableCount);
-    ImGui::BeginTable(buffer, pDetails->col_count);
+    std::string name = "t";
+    name += m_tableCount;
+    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+    int displayableColums = pDetails->head_row_count + pDetails->body_row_count;
+    if (displayableColums < 3)
+      displayableColums = 3;
+    else if (displayableColums > 7)
+      displayableColums = 7;
+
+    m_table_is_open.push_back(ImGui::BeginTable(name.c_str(), pDetails->col_count, ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollX | ImGuiTableFlags_RowBg, ImVec2(0.f, TEXT_BASE_HEIGHT * displayableColums)));
   }
   else
   {
-    ImGui::EndTable();
+    if (m_table_is_open.back())
+      ImGui::EndTable();
+
+    m_table_is_open.pop_back();
   }
 }
 
@@ -354,8 +364,7 @@ void imgui_md::render_text(const char* str, const char* str_end)
 			float wl = ImGui::GetContentRegionAvail().x;
 
 			if (m_is_table_body) {
-				wl = (m_table_next_column < m_table_col_pos.size() ?
-					m_table_col_pos[m_table_next_column] : m_table_last_pos.x);
+				wl = m_table_last_pos.x;
 				wl -= ImGui::GetCursorPosX();
 			}
 

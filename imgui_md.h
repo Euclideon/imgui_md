@@ -141,10 +141,8 @@ private:
 
 	//table state
   int m_tableCount;
-	int m_table_next_column = 0;
 	ImVec2 m_table_last_pos;
-	std::vector<float> m_table_col_pos;
-	std::vector<float> m_table_row_pos;
+  std::vector<bool> m_table_is_open;
 
 	//list state
 	struct list_info
